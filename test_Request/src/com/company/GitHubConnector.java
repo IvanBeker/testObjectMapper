@@ -14,6 +14,7 @@ public class GitHubConnector {
 
     public final static String GITHUB_API = "https://api.github.com/";
     public final static String GITHUB_USER_API = "https://api.github.com/users/";
+    public final static String GITHUB_API_REPOS = "/repos";
 
     //endregion Constants
 
