@@ -5,8 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class GitHubConnector {
 
@@ -21,26 +24,39 @@ public class GitHubConnector {
     //endregion Public
 
     public static GitHubUserModel getUserModelByName(String userName) throws IOException {
-        StringBuilder userJson = new StringBuilder();
+        StringBuilder userJson = getResponse(new URL(GITHUB_USER_API+userName));
+        StringBuilder userRepositorieJson = getResponse(new URL(GITHUB_USER_API+userName+GITHUB_API_REPOS));
+        GitHubUserModel userModel = parseUserModel(userJson.toString());
+        userModel.repositories = parseRepositoryModelList(userRepositorieJson.toString());
 
-        URL gitHubUserUrl = new URL(GITHUB_USER_API + userName);
-
-        URLConnection yc = gitHubUserUrl.openConnection();
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(yc.getInputStream()));
-
-        String inputLine;
-        while ((inputLine = bufferedReader.readLine()) != null)
-            userJson.append(inputLine);
-        bufferedReader.close();
-
-        return parseUserModel(userJson.toString());
+        return userModel;
     }
 
     //endregion Public
 
     //region Private
 
-    public static GitHubUserModel parseUserModel(String json) throws IOException {
+    private static StringBuilder getResponse(URL url) throws IOException {
+        StringBuilder responseJson = new StringBuilder();
+
+
+        URLConnection yc = url.openConnection();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(yc.getInputStream()));
+        String inputLine;
+        while ((inputLine = bufferedReader.readLine()) != null)
+            responseJson.append(inputLine);
+        bufferedReader.close();
+        return responseJson;
+    }
+
+    private static ArrayList<GitHubRepositoryModel> parseRepositoryModelList(String json) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return new ArrayList<GitHubRepositoryModel>(Arrays.asList(objectMapper.readValue(json, GitHubRepositoryModel[].class)));
+    }
+
+
+
+    private static GitHubUserModel parseUserModel(String json) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(json, GitHubUserModel.class);
     }

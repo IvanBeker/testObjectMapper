@@ -8,11 +8,12 @@ public class Main {
     public static void main(String[] args) {
         String userName = getUserName();
 
-        GitHubUserModel userModel = null;
+        GitHubUserModel userModel;
         try {
             userModel = GitHubConnector.getUserModelByName(userName);
         }catch (IOException e){
-            System.out.print(e.toString());
+            if(e.hashCode() == 173099767)
+            System.out.println("This user does not exist");
             return;
         }
 
@@ -22,7 +23,6 @@ public class Main {
     private static String getUserName() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Name: ");
-
         return scanner.next();
     }
 
