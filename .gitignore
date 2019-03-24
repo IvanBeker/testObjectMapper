@@ -1,4 +1,4 @@
-$ cat .gitignore
-/test_Request/.intel
+
+/test_Request/.intel/workspace.xml
 /test_Request/out
 /test_Request/test_Request.iml
